@@ -36,6 +36,6 @@ INSERT INTO `users` (`username`, `password`, `role`) VALUES
 ('customer', '$2y$10$B9q/M8k0XahkA5UBcuc5Ce2QiLzkkGeuoES0M0Pb1Hy1WOmairw02', 'customer');
 
 INSERT INTO `products` (`name`, `price`, `description`, `image`) VALUES
-('Iron Sword', 29.99, 'A finely crafted sword for battle.', 'uploads/sword.jpg'),
-('Shield of Valor', 39.50, 'A sturdy shield to protect against attacks.', 'uploads/shield.jpg'),
+('Iron Sword', 29.99, 'A finely crafted sword for battle.', 'uploads/aatrox_sword.jpeg'),
+('Shield of Valor', 39.50, 'A sturdy shield to protect against attacks.', 'uploads/shield.jpeg'),
 ('Healing Potion', 9.99, 'Restores health in an instant.', 'uploads/potion.jpg');
