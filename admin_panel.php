@@ -1,4 +1,27 @@
 <?php
+function saveUploadedImage($file) {
+    if (!isset($file) || $file['error'] !== UPLOAD_ERR_OK) {
+        return null;
+    }
+
+    $uploadDir = __DIR__ . '/uploads';
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
+    }
+
+    $originalName = pathinfo($file['name'], PATHINFO_FILENAME);
+    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+    $safeName = preg_replace('/[^a-zA-Z0-9._-]/', '_', $originalName);
+    $filename = $safeName . '_' . uniqid() . ($extension ? '.' . $extension : '');
+    $targetPath = $uploadDir . '/' . $filename;
+
+    if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+        return 'uploads/' . $filename;
+    }
+
+    return null;
+}
+
 session_start();
 require 'db.php';
 
@@ -19,9 +42,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check if this is an update operation
     if (isset($_POST['update_product'])) {
         $productId = $_POST['product_id'];
-        if ($_FILES['image']['error'] == 0) {
-            $image = 'uploads/' . basename($_FILES['image']['name']);
-            move_uploaded_file($_FILES['image']['tmp_name'], $image);
+        $image = null;
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $image = saveUploadedImage($_FILES['image']);
+        }
+
+        if ($image) {
             $stmt = $conn->prepare("UPDATE products SET name = ?, price = ?, description = ?, image = ? WHERE id = ?");
             $stmt->execute([$name, $price, $description, $image, $productId]);
         } else {
@@ -29,9 +55,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->execute([$name, $price, $description, $productId]);
         }
     } else { // Add new product
-        if ($_FILES['image']['error'] == 0) {
-            $image = 'uploads/' . basename($_FILES['image']['name']);
-            move_uploaded_file($_FILES['image']['tmp_name'], $image);
+        $image = null;
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $image = saveUploadedImage($_FILES['image']);
+        }
+
+        if ($image) {
             $stmt = $conn->prepare("INSERT INTO products (name, price, description, image) VALUES (?, ?, ?, ?)");
             $stmt->execute([$name, $price, $description, $image]);
         }
